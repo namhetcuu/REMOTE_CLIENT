@@ -24,14 +24,18 @@ public class ClientController extends Thread {
 	public ClientController() {
 		clientView = new ClientView();
 
+		//button tên kết nối
+		//khi khởi chạy client thì panel_connect sẽ chạy đầu tiên và khi connect thành công thì panel chính sẽ load ra
 		clientView.connectServer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String ip = clientView.ip_tf.getText();
 				int port = Integer.parseInt(clientView.port_tf.getText());
 				client = new Client(ip, port);
 			}
+			
 		});
 
+		//khi đã connect tới server thành công thì button này là kết nối toi may khac
 		clientView.connectScreen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int id = Integer.parseInt(clientView.idTf.getText());
@@ -245,6 +249,7 @@ public class ClientController extends Thread {
 
 		while (true) {
 			System.out.print("");
+			//ban đầu isConnect là false
 			if (isConnect) {
 				clientView.messageTa.setText(client.getMessageAll());
 			} else {
@@ -255,7 +260,8 @@ public class ClientController extends Thread {
 					isConnect = true;
 					clientView.setUser(user);
 					clientView.setPanelMain();
-					System.out.println("Connect");
+					System.out.println("Connected");
+					//System.out.println(user);
 				}
 			}
 			if (screenShare != null) {

@@ -3,6 +3,7 @@ package models;
 import java.net.Socket;
 
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 public class Client {
     private Socket socket;
@@ -25,12 +26,19 @@ public class Client {
     
     public Client(String ip, int port) {
         try {
+        	System.out.println("đối tượng đã đc khởi tạo thành công");
             this.socket = new Socket(ip, port);
             System.out.println("Connected to server");
             clientThread = new ClientThread(socket);
             clientThread.start();
         } catch (Exception e) {
-            e.printStackTrace();
+        	JOptionPane.showMessageDialog(null, 
+                    "Không thể kết nối tới server. Vui lòng kiểm tra lại IP và Port, hoặc đảm bảo server đang chạy.", 
+                    "Lỗi kết nối", 
+                    JOptionPane.ERROR_MESSAGE);
+                System.out.println("Server chưa khởi động!");
+                this.socket = null;
+            
         }
     }
     
@@ -42,11 +50,23 @@ public class Client {
         clientThread.setUser(user);
     }
 
+//    public User getUser() {
+//        User user = clientThread.getUser();
+//        setUser(user);
+//        return user;
+//    }
     public User getUser() {
-        User user = clientThread.getUser();
-        setUser(user);
-        return user;
+        if (clientThread == null) {
+            // Hiển thị thông báo lỗi khi clientThread chưa được khởi tạo
+            JOptionPane.showMessageDialog(null, 
+                "Chưa kết nối tới server. Vui lòng kiểm tra kết nối.", 
+                "Lỗi kết nối", 
+                JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+        return clientThread.getUser();
     }
+
 
     public Socket getSocket() {
         return socket;
