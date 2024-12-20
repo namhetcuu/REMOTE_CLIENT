@@ -41,7 +41,7 @@ public class ClientThread extends Thread{
                 this.user = (User)(object);
                 System.out.println("Object: " + object);
             }
-
+          //kiem tra xem object co phai la instance of message ko 
             if (object instanceof Messager) {
 				Messager messager = (Messager) object;
 				System.out.println(messager.getText());
@@ -55,6 +55,7 @@ public class ClientThread extends Thread{
                     case "Connect success":
                         User user = (User) messager.getObject();
                         this.userConnect = user;
+                        //client gửi yêu cầu kết nối nhận đc dòng này
                         System.out.println("Connect success " + user.getId());
                         JOptionPane.showMessageDialog(null, "Kết nối thành công tới ID = " + user.getId());
                         break;
@@ -96,9 +97,10 @@ public class ClientThread extends Thread{
                     	new AdjustBrightness(bright).adjustBrightness();
                     	break;
                     case "Server To Client: ScreenShare":
+                    	//biến user này là của client kết nối
                     	user = (User) messager.getObject();
                     	
-                    	Timer time = new Timer(50, new ActionListener() {
+                    	Timer time = new Timer(5000, new ActionListener() {
 							
 							@Override
 							public void actionPerformed(ActionEvent e) {

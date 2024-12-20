@@ -30,7 +30,6 @@ public class ChangeDesktopBackground {
         }
     }
     public static void main(String[] args) {
-//		new ChangeDesktopBackground("C:\\Users\\HAIZUKA\\Downloads\\background_.jpg").changeDesktop();
 		new ChangeDesktopBackground("G:\\remote-screen-control\\client\\background.jpg").changeDesktop();
 	}
 }

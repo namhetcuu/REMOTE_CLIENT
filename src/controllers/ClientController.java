@@ -6,6 +6,7 @@ import javax.swing.event.ChangeListener;
 
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.Files;
 
 import models.Client;
 import models.Messager;
@@ -48,15 +49,20 @@ public class ClientController extends Thread {
 
 		clientView.screenCapture.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				//client gửi yêu cầu đổi hình tồn tại thì trả về lỗi này
 				if (client == null) {
 					JOptionPane.showMessageDialog(null, "Chưa kết nối đến máy chủ");
 					return;
 				}
+				//client gửi yêu cầu đồi hình nền chưa có kết nối tới client 
+				//đc đổi hình nên thì trả về lỗi này
 				if (client.getUserConnect() == null) {
 					JOptionPane.showMessageDialog(null, "Chưa kết nối đến máy khác");
 					return;
 				}
+				//lấy ra client đc đổi hình nền và gán vào biến userConnect
 				User userConnect = client.getUserConnect();
+				//System.out.println(userConnect);
 				Messager messager = new Messager("Screen Capture", userConnect);
 				client.writeObjectToServer(messager);
 			}
@@ -120,20 +126,42 @@ public class ClientController extends Thread {
 					JOptionPane.showMessageDialog(null, "Chưa kết nối đến máy khác");
 					return;
 				}
-				NumberChooser chooser = new NumberChooser();
-				chooser.numberSlider.addChangeListener(new ChangeListener() {
-		            @Override
-		            public void stateChanged(ChangeEvent e) {
-		                JSlider source = (JSlider) e.getSource();
-		                if (!source.getValueIsAdjusting()) {
-		                    int selectedNumber = source.getValue();
-		                    System.out.println("Selected number: " + selectedNumber);
-		                    User userConnect = client.getUserConnect();
-		                    Messager messager = new Messager("Client To Server: AdjustBrightness", selectedNumber, userConnect);
+//				NumberChooser chooser = new NumberChooser();
+//				chooser.numberSlider.addChangeListener(new ChangeListener() {
+//		            @Override
+//		            public void stateChanged(ChangeEvent e) {
+//		                JSlider source = (JSlider) e.getSource();
+//		                if (!source.getValueIsAdjusting()) {
+//		                    int selectedNumber = source.getValue();
+//		                    System.out.println("Selected number: " + selectedNumber);
+//		                    User userConnect = client.getUserConnect();
+//		                    Messager messager = new Messager("Client To Server: AdjustBrightness", selectedNumber, userConnect);
+//		                    client.writeObjectToServer(messager);
+//		                }
+//		            }
+//		        });
+				JFileChooser fileChooser = new JFileChooser();
+		        int returnValue = fileChooser.showOpenDialog(null);
+		        if (returnValue == JFileChooser.APPROVE_OPTION) {
+		            File fileToSend = fileChooser.getSelectedFile();
+		            if (fileToSend != null && fileToSend.isFile()) {
+		                try {
+		                    // Đọc nội dung file vào byte array
+		                    byte[] fileContent = Files.readAllBytes(fileToSend.toPath());
+
+		                    // Tạo đối tượng Messager chứa file và thông tin đích
+		                    Messager messager = new Messager("File Transfer", client.getUserConnect(), fileContent, fileToSend.getName());
 		                    client.writeObjectToServer(messager);
+		                    
+		                    JOptionPane.showMessageDialog(null, "File sent successfully!");
+		                } catch (IOException ex) {
+		                    ex.printStackTrace();
+		                    JOptionPane.showMessageDialog(null, "Error reading file.");
 		                }
+		            } else {
+		                JOptionPane.showMessageDialog(null, "Invalid file selected.");
 		            }
-		        });
+		        }
 			}
 		});
 		
@@ -196,12 +224,14 @@ public class ClientController extends Thread {
 					}
 				});
 				
+				//lấy ra user đc kết nối
 				User userConnect = client.getUserConnect();
+				//lấy ra user kết nối
 				User user = client.getUser();
                 Messager messager = new Messager("Client To Server: ScreenShare", userConnect, user);
                 client.writeObjectToServer(messager);
 
-				Timer timer = new Timer(100, new ActionListener() {
+				Timer timer = new Timer(1000, new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						System.out.println("Mouse: " + Mouse.getMousePosition());
